@@ -11,6 +11,6 @@ import java.rmi.RemoteException;
 public class Client {
     public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException {
         PrintService service = (PrintService) Naming.lookup("rmi://localhost:5099/print");
-        System.out.println("--- " + service.echo("Hey server"));
+        service.start();
     }
 }
