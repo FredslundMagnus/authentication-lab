@@ -33,19 +33,17 @@ public class PrintServant extends UnicastRemoteObject implements PrintService {
     }
 
     @Override
-    public void start() throws RemoteException {
-        // TODO Auto-generated method stub
+    public String start() throws RemoteException {
+        return "The printing service has started.";
     }
 
     @Override
-    public void stop() throws RemoteException {
-        // TODO Auto-generated method stub
+    public String stop() throws RemoteException {
+        return "The printing service has stopped.";
     }
 
     @Override
     public void restart() throws RemoteException {
-        // stops the print server, clears the print queue
-        // and starts the print server again
         stop();
         this.queues = new HashMap<String, ArrayList<String>>();
         start();
