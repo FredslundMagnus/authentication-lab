@@ -44,10 +44,10 @@ public class PrintServant extends UnicastRemoteObject implements PrintService {
 
     @Override
     public void restart() throws RemoteException {
-        // stops the print server, clears the print queue and starts the print server
-        // again
+        // stops the print server, clears the print queue
+        // and starts the print server again
         stop();
-        // clear query
+        this.queues = new HashMap<String, ArrayList<String>>();
         start();
     }
 
