@@ -16,10 +16,12 @@ public class Client {
         String token = service.login("Magnus", "strongPassword");
         System.out.println(token);
         service.print("file_01", "Printer 01", token, 0);
-        service.start(token, 1);
+        service.queue("Printer 01", token, 1);
         service.setConfig("user", "Magnus", token, 2);
         System.out.println(service.readConfig("user", token, 3));
         System.out.println(service.readConfig("user", token, 4));
         System.out.println(service.readConfig("user", token, 5));
+        service.logout(token);
+        service.queue("Printer 01", token, 1);
     }
 }
