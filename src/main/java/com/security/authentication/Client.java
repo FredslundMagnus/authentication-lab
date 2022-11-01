@@ -19,5 +19,7 @@ public class Client {
         service.start(token, 1);
         service.setConfig("user", "Magnus", token, 2);
         System.out.println(service.readConfig("user", token, 3));
+        System.out.println(service.readConfig("user", token, 4));
+        System.out.println(service.readConfig("user", token, 5));
     }
 }

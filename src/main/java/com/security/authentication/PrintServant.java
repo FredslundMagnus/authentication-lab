@@ -62,6 +62,9 @@ public class PrintServant extends UnicastRemoteObject implements PrintService {
         if (tokens.get(token).contains(Integer.toString(unique))) {
             throw new RemoteException("Authentication Failed - Is replay attack");
         }
+        if (tokens.get(token).size() >= 5) {
+            throw new RemoteException("Authentication Failed - Token expired");
+        }
         tokens.get(token).add(Integer.toString(unique));
     }
 
