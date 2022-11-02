@@ -33,5 +33,10 @@ public class Client {
         client.restart();
         client.status("Printer 01");
         client.queue("Printer 01");
+        ClientService client2 = new ClientService();
+        client2.login("Chunxue", "strongPassword456");
+        client.print("file_02", "Printer 01");
+        client2.print("file_05", "Printer 01");
+        client.queue("Printer 01");
     }
 }
