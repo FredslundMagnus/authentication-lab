@@ -10,18 +10,29 @@ import java.rmi.RemoteException;
  */
 public class Client {
     public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException {
-        PrintService service = (PrintService) Naming.lookup("rmi://localhost:5099/print");
-        System.out.println(service.login("FakeUser", "strongPassword"));
-        System.out.println(service.login("Magnus", "wrongPassword"));
-        String token = service.login("Magnus", "strongPassword");
-        System.out.println(token);
-        service.print("file_01", "Printer 01", token, 0);
-        service.queue("Printer 01", token, 1);
-        service.setConfig("user", "Magnus", token, 2);
-        System.out.println(service.readConfig("user", token, 3));
-        System.out.println(service.readConfig("user", token, 4));
-        System.out.println(service.readConfig("user", token, 5));
-        service.logout(token);
-        service.queue("Printer 01", token, 1);
+        ClientService client = new ClientService();
+
+        client.login("FakeUser", "strongPassword");
+        client.login("Magnus", "wrongPassword");
+        client.login("Magnus", "strongPassword");
+        client.print("file_01", "Printer 01");
+        client.print("file_03", "Printer 01");
+        client.print("file_07", "Printer 01");
+        client.queue("Printer 01");
+        client.topQueue("Printer 01", 2);
+        client.queue("Printer 01");
+        client.setConfig("pageType", "A4");
+        client.readConfig("pageType");
+        client.logout();
+        client.queue("Printer 01");
+        client.login("Emily", "strongPassword123");
+        client.readConfig("pageType");
+        client.queue("Printer 01");
+        client.status("Printer 01");
+        client.topQueue("Printer 01", 3);
+        client.queue("Printer 01");
+        client.restart();
+        client.status("Printer 01");
+        client.queue("Printer 01");
     }
 }

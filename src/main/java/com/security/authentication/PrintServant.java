@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.lang.model.type.NullType;
+
 public class PrintServant extends UnicastRemoteObject implements PrintService {
     private Map<String, String> config;
     private HashMap<String, ArrayList<String>> queues;
@@ -79,55 +81,60 @@ public class PrintServant extends UnicastRemoteObject implements PrintService {
     }
 
     @Override
-    public void print(String filename, String printer, String token, int unique) throws RemoteException {
+    public Response<NullType> print(String filename, String printer, String token, int unique) throws RemoteException {
         String username = validate(token, unique);
         if (queues.get(printer) == null) {
             queues.put(printer, new ArrayList<String>());
         }
         queues.get(printer).add(filename);
         log(username, "Printed '" + filename + "' on printer '" + printer + "'.");
+        return new Response<NullType>(null, token, unique);
     }
 
     @Override
-    public ArrayList<String> queue(String printer, String token, int unique) throws RemoteException {
+    public Response<ArrayList<String>> queue(String printer, String token, int unique) throws RemoteException {
         String username = validate(token, unique);
+        if (queues.containsKey(printer) == false) {
+            queues.put(printer, new ArrayList<String>());
+        }
         ArrayList<String> q = queues.get(printer);
         log(username, "Accessed queue for printer '" + printer + "' with queue: " + q.toString() + ".");
-        return q;
+        return new Response<ArrayList<String>>(q, token, unique);
     }
 
     @Override
-    public void topQueue(String printer, int job, String token, int unique) throws RemoteException {
+    public Response<NullType> topQueue(String printer, int job, String token, int unique) throws RemoteException {
         String username = validate(token, unique);
         String old = queues.get(printer).remove(job);
         queues.get(printer).add(0, old);
         log(username, "Moved job '" + job + "' to the top of the queue for printer '" + printer + "'.");
+        return new Response<NullType>(null, token, unique);
     }
 
     @Override
-    public String start(String token, int unique) throws RemoteException {
+    public Response<String> start(String token, int unique) throws RemoteException {
         String username = validate(token, unique);
         log(username, "Started printing service.");
-        return "The printing service has started.";
+        return new Response<String>("The printing service has started.", token, unique);
     }
 
     @Override
-    public String stop(String token, int unique) throws RemoteException {
+    public Response<String> stop(String token, int unique) throws RemoteException {
         String username = validate(token, unique);
         log(username, "Stopped printing service.");
-        return "The printing service has stopped.";
+        return new Response<String>("The printing service has stopped.", token, unique);
     }
 
     @Override
-    public String restart(String token, int unique) throws RemoteException {
+    public Response<String> restart(String token, int unique) throws RemoteException {
         String username = validate(token, unique);
         this.queues = new HashMap<String, ArrayList<String>>();
         log(username, "Restarted printing service.");
-        return "The printing service has been restarted.";
+        return new Response<String>("The printing service has been restarted.", token, unique);
     }
 
     @Override
-    public String status(String printer, String token, int unique) throws RemoteException {
+    public Response<String> status(String printer, String token, int unique) throws RemoteException {
         String username = validate(token, unique);
         String status;
         if (queues.get(printer) == null) {
@@ -136,22 +143,24 @@ public class PrintServant extends UnicastRemoteObject implements PrintService {
             status = queues.get(printer).size() == 0 ? "Ready" : "Printing";
         }
         log(username, "Checked status: " + status + ".");
-        return status;
+        return new Response<String>(status, token, unique);
     }
 
     @Override
-    public String readConfig(String parameter, String token, int unique) throws RemoteException {
+    public Response<String> readConfig(String parameter, String token, int unique) throws RemoteException {
         String username = validate(token, unique);
         String value = config.get(parameter);
         log(username, "Read config of '" + parameter + "' with value '" + value + "'.");
-        return value;
+        return new Response<String>(value, token, unique);
     }
 
     @Override
-    public void setConfig(String parameter, String value, String token, int unique) throws RemoteException {
+    public Response<NullType> setConfig(String parameter, String value, String token, int unique)
+            throws RemoteException {
         String username = validate(token, unique);
         config.put(parameter, value);
         log(username, "Set config of '" + parameter + "' with value '" + value + "'.");
+        return new Response<NullType>(null, token, unique);
     }
 
     @Override
