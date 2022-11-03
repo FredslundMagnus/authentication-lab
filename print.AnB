@@ -1,0 +1,23 @@
+Protocol: PrinterService
+
+Types: Agent A,server;
+       Number M1,M2,T,N,Response1,Response2;
+       Function pw,mac,inc
+
+Knowledge: A: A,server,pw(A),inc;
+	    server: A,mac(pw(A)),inc
+
+Actions:
+A *->* server: A,pw(A)
+server *->* A: T
+A *->* server: N,T,M1
+server *->* A: N,T,Response1
+A *->* server: inc(N),T,M2
+server *->* A: inc(N),T,Response2
+
+Goals:
+server authenticates A on M1
+server authenticates A on M2
+A authenticates server on Response1
+A authenticates server on Response2
+pw(A) secret between A, server
