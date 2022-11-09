@@ -6,36 +6,11 @@ import java.rmi.RemoteException;
 
 public class Client {
     public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException {
-        ClientService client = new ClientService();
-        ClientService client2 = new ClientService();
+        Tasks task = Tasks.AccessControlList;
+        ClientService client = new ClientService(task);
+        // ClientService client2 = new ClientService(task);
 
-        client.login("FakeUser", "strongPassword");
-        client.login("Magnus", "wrongPassword");
-        client.login("Magnus", "strongPassword");
-        client.print("file_01", "Printer 01");
-        client.print("file_03", "Printer 01");
-        client.print("file_07", "Printer 01");
-        client.queue("Printer 01");
-        client.topQueue("Printer 01", 2);
-        client.queue("Printer 01");
-        client.setConfig("pageType", "A4");
-        client.readConfig("pageType");
-        client.logout();
-        client.queue("Printer 01");
-        client.login("Emily", "strongPassword123");
-        client.readConfig("pageType");
-        client.queue("Printer 01");
-        client.status("Printer 01");
-        client.topQueue("Printer 01", 3);
-        client.queue("Printer 01");
-        client.restart();
-        client.status("Printer 01");
-        client.queue("Printer 01");
-        client2.login("Chunxue", "strongPassword456");
-        client.print("file_02", "Printer 01");
-        client2.print("file_05", "Printer 01");
-        client.queue("Printer 01");
-        client2.logout();
-        client.logout();
+        client.login("Alice", "AlicePassword");
+
     }
 }

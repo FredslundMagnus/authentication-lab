@@ -13,8 +13,8 @@ public class ClientService {
     private int unique;
     private String token;
 
-    public ClientService() throws MalformedURLException, RemoteException, NotBoundException {
-        this.service = (PrintService) Naming.lookup("rmi://localhost:5099/print");
+    public ClientService(Tasks accessProtocol) throws MalformedURLException, RemoteException, NotBoundException {
+        this.service = (PrintService) Naming.lookup("rmi://localhost:5099/" + accessProtocol.name());
         this.unique = 0;
     }
 

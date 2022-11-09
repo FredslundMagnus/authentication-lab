@@ -12,27 +12,44 @@ import java.util.Map;
 
 import javax.lang.model.type.NullType;
 
-public class PrintServant extends UnicastRemoteObject implements PrintService {
-    private Map<String, String> config;
-    private HashMap<String, ArrayList<String>> queues;
-    private Map<String, String> logins;
-    private SecureRandom random;
-    private Map<String, ArrayList<String>> tokens;
-    private Map<String, String> users;
-
-    protected PrintServant() throws RemoteException {
+abstract class AbstractServant extends UnicastRemoteObject implements PrintService {
+    protected AbstractServant(String configFile) throws RemoteException {
         super();
+        this.configFile = configFile;
         this.logins = new HashMap<String, String>();
         this.config = new HashMap<String, String>();
         this.queues = new HashMap<String, ArrayList<String>>();
         this.tokens = new HashMap<String, ArrayList<String>>();
         this.users = new HashMap<String, String>();
         this.random = new SecureRandom();
-        logins.put("Magnus", hash("strongPassword"));
-        logins.put("Emily", hash("strongPassword123"));
-        logins.put("Chunxue", hash("strongPassword456"));
-        logins.put("Arianna", hash("strongPassword789"));
+
+        if (!configFile.contains("AfterChange")) {
+            logins.put("Alice", hash("AlicePassword"));
+            logins.put("Bob", hash("BobPassword"));
+            logins.put("Cecilia", hash("CeciliaPassword"));
+            logins.put("David", hash("DavidPassword"));
+            logins.put("Erica", hash("EricaPassword"));
+            logins.put("Fred", hash("FredPassword"));
+            logins.put("George", hash("GeorgePassword"));
+        } else {
+            logins.put("Alice", hash("AlicePassword"));
+            logins.put("Cecilia", hash("CeciliaPassword"));
+            logins.put("David", hash("DavidPassword"));
+            logins.put("Erica", hash("EricaPassword"));
+            logins.put("Fred", hash("FredPassword"));
+            logins.put("George", hash("GeorgePassword"));
+            logins.put("Henry", hash("HenryPassword"));
+            logins.put("Ida", hash("IdaPassword"));
+        }
     }
+
+    protected String configFile;
+    protected Map<String, String> config;
+    protected HashMap<String, ArrayList<String>> queues;
+    protected Map<String, String> logins;
+    protected SecureRandom random;
+    protected Map<String, ArrayList<String>> tokens;
+    protected Map<String, String> users;
 
     public static String hash(String value) {
         MessageDigest md;
@@ -60,7 +77,11 @@ public class PrintServant extends UnicastRemoteObject implements PrintService {
         return token;
     }
 
-    private String validate(String token, int unique) throws RemoteException {
+    protected boolean hasAccess(String user, String method) {
+        return true;
+    }
+
+    protected String validate(String token, int unique, String method) throws RemoteException {
         if (tokens.get(token) == null) {
             throw new RemoteException("Authentication Failed - Token not valid");
         }
@@ -73,7 +94,11 @@ public class PrintServant extends UnicastRemoteObject implements PrintService {
             throw new RemoteException("Authentication Failed - Token expired");
         }
         tokens.get(token).add(Integer.toString(unique));
-        return users.get(token);
+        String user = users.get(token);
+        if (!hasAccess(user, method)) {
+            throw new RemoteException("Access Denied - You have not Access to '" + method + "'.");
+        }
+        return user;
     }
 
     private void log(String username, String message) {
@@ -82,7 +107,7 @@ public class PrintServant extends UnicastRemoteObject implements PrintService {
 
     @Override
     public Response<NullType> print(String filename, String printer, String token, int unique) throws RemoteException {
-        String username = validate(token, unique);
+        String username = validate(token, unique, "print");
         if (queues.get(printer) == null) {
             queues.put(printer, new ArrayList<String>());
         }
@@ -93,7 +118,7 @@ public class PrintServant extends UnicastRemoteObject implements PrintService {
 
     @Override
     public Response<ArrayList<String>> queue(String printer, String token, int unique) throws RemoteException {
-        String username = validate(token, unique);
+        String username = validate(token, unique, "queue");
         if (queues.containsKey(printer) == false) {
             queues.put(printer, new ArrayList<String>());
         }
@@ -104,7 +129,7 @@ public class PrintServant extends UnicastRemoteObject implements PrintService {
 
     @Override
     public Response<NullType> topQueue(String printer, int job, String token, int unique) throws RemoteException {
-        String username = validate(token, unique);
+        String username = validate(token, unique, "topQueue");
         String old = queues.get(printer).remove(job);
         queues.get(printer).add(0, old);
         log(username, "Moved job '" + job + "' to the top of the queue for printer '" + printer + "'.");
@@ -113,21 +138,21 @@ public class PrintServant extends UnicastRemoteObject implements PrintService {
 
     @Override
     public Response<String> start(String token, int unique) throws RemoteException {
-        String username = validate(token, unique);
+        String username = validate(token, unique, "start");
         log(username, "Started printing service.");
         return new Response<String>("The printing service has started.", token, unique);
     }
 
     @Override
     public Response<String> stop(String token, int unique) throws RemoteException {
-        String username = validate(token, unique);
+        String username = validate(token, unique, "stop");
         log(username, "Stopped printing service.");
         return new Response<String>("The printing service has stopped.", token, unique);
     }
 
     @Override
     public Response<String> restart(String token, int unique) throws RemoteException {
-        String username = validate(token, unique);
+        String username = validate(token, unique, "restart");
         this.queues = new HashMap<String, ArrayList<String>>();
         log(username, "Restarted printing service.");
         return new Response<String>("The printing service has been restarted.", token, unique);
@@ -135,7 +160,7 @@ public class PrintServant extends UnicastRemoteObject implements PrintService {
 
     @Override
     public Response<String> status(String printer, String token, int unique) throws RemoteException {
-        String username = validate(token, unique);
+        String username = validate(token, unique, "status");
         String status;
         if (queues.get(printer) == null) {
             status = "Ready";
@@ -148,7 +173,7 @@ public class PrintServant extends UnicastRemoteObject implements PrintService {
 
     @Override
     public Response<String> readConfig(String parameter, String token, int unique) throws RemoteException {
-        String username = validate(token, unique);
+        String username = validate(token, unique, "readConfig");
         String value = config.get(parameter);
         log(username, "Read config of '" + parameter + "' with value '" + value + "'.");
         return new Response<String>(value, token, unique);
@@ -157,7 +182,7 @@ public class PrintServant extends UnicastRemoteObject implements PrintService {
     @Override
     public Response<NullType> setConfig(String parameter, String value, String token, int unique)
             throws RemoteException {
-        String username = validate(token, unique);
+        String username = validate(token, unique, "setConfig");
         config.put(parameter, value);
         log(username, "Set config of '" + parameter + "' with value '" + value + "'.");
         return new Response<NullType>(null, token, unique);
