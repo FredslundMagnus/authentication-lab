@@ -1,4 +1,4 @@
-package com.security.authentication;
+package com.security.accesscontrol;
 
 import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;

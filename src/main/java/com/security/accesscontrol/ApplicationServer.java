@@ -1,4 +1,4 @@
-package com.security.authentication;
+package com.security.accesscontrol;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -9,7 +9,8 @@ public class ApplicationServer {
         Registry registry = LocateRegistry.createRegistry(5099);
         registry.rebind("AccessControlList", new AccessControlListServant("AccessControlList.csv"));
         registry.rebind("RoleBased", new RoleBasedServant("RoleBased.csv"));
-        registry.rebind("AccessControlListAfterChange", new AccessControlListServant("AccessControlListAfterChange.csv"));
+        registry.rebind("AccessControlListAfterChange",
+                new AccessControlListServant("AccessControlListAfterChange.csv"));
         registry.rebind("RoleBasedAfterChange", new RoleBasedServant("RoleBasedAfterChange.csv"));
     }
 }

@@ -1,4 +1,4 @@
-package com.security.authentication;
+package com.security.accesscontrol;
 
 import org.junit.jupiter.api.Test;
 
