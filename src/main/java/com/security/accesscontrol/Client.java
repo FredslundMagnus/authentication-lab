@@ -14,6 +14,5 @@ public class Client {
         client.print("File 01", "Printer 01");
         client2.login("Bob", "BobPassword");
         client2.print("File 01", "Printer 01");
-
     }
 }
