@@ -11,9 +11,9 @@ public class Client {
         ClientService client2 = new ClientService(task);
 
         client.login("Alice", "AlicePassword");
-        client.print("ssdf", "printer 1");
+        client.print("File 01", "Printer 01");
         client2.login("Bob", "BobPassword");
-        client2.print("ssdf", "printer 1");
+        client2.print("File 01", "Printer 01");
 
     }
 }
