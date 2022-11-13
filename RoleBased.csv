@@ -1,0 +1,13 @@
+method: print,queue,topQueue,start,stop,restart,status,readConfig,setConfig
+manager: 1,1,1,1,1,1,1,1,1
+technician: 0,0,0,1,1,1,1,1,1
+power_user: 1,1,1,0,0,1,0,0,0
+ordinary: 1,1,0,0,0,0,0,0,0
+
+Alice: manager
+Bob: technician
+Cecilia: power_user
+David: ordinary
+Erica: ordinary
+Fred: ordinary
+George: ordinary
