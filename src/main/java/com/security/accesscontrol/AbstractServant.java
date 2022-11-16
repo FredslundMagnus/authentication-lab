@@ -206,9 +206,12 @@ abstract class AbstractServant extends UnicastRemoteObject implements PrintServi
     public void logout(String token) throws RemoteException {
         tokens.remove(token);
         String username = users.get(token);
+
         users.remove(token);
         if (username != null) {
             log(username, "Logged out.");
+        } else {
+            throw new RemoteException("No user was logged in.");
         }
     }
 }
